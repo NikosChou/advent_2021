@@ -4,10 +4,11 @@ val scala3Version = "3.1.0"
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "scala3-cross",
+    name := "Advent_2021 scala3-cross",
     version := "0.1.0",
 
-    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test,
+    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.10",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test",
 
     // To make the default compiler and REPL use Dotty
     scalaVersion := scala3Version,
