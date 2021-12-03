@@ -11,8 +11,9 @@ trait Day3 {
     def findGammaRate(input: List[Binary]): Binary = {
       Binary(
         (0 until input.head.bits.length)
-          .map(i => Binary(input.map(b => b.bits(i))))
-          .map(_.findCommonBit())
+          .map(i => input.map(_.bits(i)))
+          .map(Binary(_))
+          .map(_.findCommonBit)
           .toList.asInstanceOf[List[Bit]]
       )
     }
@@ -21,18 +22,18 @@ trait Day3 {
   }
 
   def calculateOxygeRate(input: List[Binary]): LifeSupport = {
-    def findLastBinary(bitsMapper: PowerConsumption => Binary, rest: List[Binary] = input, position: Int = 0): Binary = {
+    def findLastBinary(bitMapper: Binary => Bit, rest: List[Binary] = input, position: Int = 0): Binary = {
       if (rest.tail.isEmpty) {
         return rest.head
       }
 
-      val bits: List[Bit] = bitsMapper(calculatePowerConsumption(rest)).bits
-      val filtered = rest.filter(bin => bin.bits(position) == bits(position))
-      findLastBinary(bitsMapper, filtered, position + 1)
+      val bit = bitMapper(Binary(rest.map(_.bits(position))))
+      val filtered = rest.filter(bin => bin.bits(position) == bit)
+      findLastBinary(bitMapper, filtered, position + 1)
     }
 
-    val findOxygen = findLastBinary(_.gamma)
-    val findCo2 = findLastBinary(_.epsilon)
+    val findOxygen = findLastBinary(_.findCommonBit)
+    val findCo2 = findLastBinary(b => b.findCommonBit.not)
     LifeSupport(findOxygen, findCo2)
   }
 }
