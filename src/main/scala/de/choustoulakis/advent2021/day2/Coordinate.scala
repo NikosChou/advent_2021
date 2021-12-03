@@ -21,3 +21,7 @@ case class Coordinate(x: Int, y: Int, depth: Int = 0) {
     case Up(value) => this - Coordinate(0, value)
   }
 }
+
+object Coordinate {
+  val START = Coordinate(0, 0)
+}

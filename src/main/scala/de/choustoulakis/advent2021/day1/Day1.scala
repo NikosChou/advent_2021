@@ -1,10 +1,9 @@
 package de.choustoulakis.advent2021.day1
 
-import de.choustoulakis.advent2021.day1.Submarine.{Normalizer, START, ZERO}
-import de.choustoulakis.advent2021.day2.*
+import de.choustoulakis.advent2021.day1.Day1.{Normalizer, ZERO}
 
-class Submarine {
 
+trait Day1 {
   def countTimesDepthChanged(depths: List[Int], normalizer: Normalizer = ZERO): Int = {
     def countTimesDepthChanged(depths: List[Int]): Int = depths.zip(depths.tail).filter(_ < _).size
 
@@ -15,13 +14,10 @@ class Submarine {
       }
     }
   }
-
-  def calculatePosition(commands: List[Command]): Coordinate = commands.foldLeft(START)(_ move _)
 }
 
-object Submarine {
+object Day1 {
   type Normalizer = 0 | 3
 
   val ZERO: Normalizer = 0
-  val START = Coordinate(0, 0)
 }
