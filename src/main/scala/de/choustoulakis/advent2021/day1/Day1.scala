@@ -1,10 +1,15 @@
 package de.choustoulakis.advent2021.day1
 
-import de.choustoulakis.advent2021.day1.Day1.{Normalizer, ZERO}
+import de.choustoulakis.advent2021.Puzzle
+import de.choustoulakis.advent2021.day1.Day1.{Input, Normalizer, ZERO}
 
 
-trait Day1 {
-  def countTimesDepthChanged(depths: List[Int], normalizer: Normalizer = ZERO): Int = {
+trait Day1 extends Puzzle[Input, Int] {
+  val day = 1
+
+  override def solve(input: Input): Int = {
+    val (depths, normalizer) = input
+
     def countTimesDepthChanged(depths: List[Int]): Int = depths.zip(depths.tail).filter(_ < _).size
 
     countTimesDepthChanged {
@@ -17,6 +22,7 @@ trait Day1 {
 }
 
 object Day1 {
+  type Input = (List[Int], Normalizer)
   type Normalizer = 0 | 3
 
   val ZERO: Normalizer = 0

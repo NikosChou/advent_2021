@@ -1,9 +1,13 @@
 package de.choustoulakis.advent2021.day6
 
-import de.choustoulakis.advent2021.day6.Day6.Population
+import de.choustoulakis.advent2021.Puzzle
+import de.choustoulakis.advent2021.day6.Day6.{Input, Population}
 
-trait Day6:
-  def solve(input: String, days: Int): Long =
+trait Day6 extends Puzzle[Input, Long] :
+  val day: Int = 6
+
+  override def solve(in: Input): Long =
+    val (input, days) = in
     val fishes = input.split(",").map(_.toInt)
     val population = Population(fishes.groupBy(identity).map {
       case (typ, fs) => (typ -> fs.length.toLong)
@@ -15,6 +19,8 @@ trait Day6:
     helper(population, days).sumPopulation
 
 object Day6:
+  type Input = (String, Int)
+
   case class Population(private var fishes: Map[Int, Long]):
     fishes = fishes.withDefaultValue(0L)
 

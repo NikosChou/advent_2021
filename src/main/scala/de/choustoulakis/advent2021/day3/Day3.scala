@@ -1,11 +1,18 @@
 package de.choustoulakis.advent2021.day3
 
+import de.choustoulakis.advent2021.Puzzle
 import de.choustoulakis.advent2021.day3.Day3.*
 import de.choustoulakis.advent2021.day3.Binary.*
 
 import java.math.BigInteger
 
-trait Day3 {
+trait Day3 extends Puzzle[List[Binary], Output] {
+  val day = 3
+
+  override def solve(input: List[Binary]): Output = (
+    calculatePowerConsumption(input),
+    calculateOxygeRate(input)
+  )
 
   def calculatePowerConsumption(input: List[Binary]): PowerConsumption = {
     def findGammaRate(input: List[Binary]): Binary = {
@@ -39,6 +46,7 @@ trait Day3 {
 }
 
 object Day3 {
+  type Output = (PowerConsumption, LifeSupport)
 
   case class LifeSupport(oxygenRate: Binary, co2Rate: Binary) {
     val rate = (oxygenRate * co2Rate).toDecimal

@@ -29,22 +29,22 @@ class Day4Test extends SubmarineSpec with Day4 {
         | 2  0 12  3  7""".stripMargin
 
     "play first win board" in {
-      hitFisrt(board) shouldBe 4512
+      solve(board, _.play) shouldBe 4512
     }
 
     "play last win board" in {
-      hitLast(board) shouldBe 1924
+      solve(board, _.playLast) shouldBe 1924
     }
   }
 
   "The bingo (Source)" should {
-    val board = Source.fromResource("day4/input.txt").getLines().reduce(_ + "\n" + _)
+    val board = resource.reduce(_ + "\n" + _)
     "play first win board" in {
-      hitFisrt(board) shouldBe 23177
+      solve(board, _.play) shouldBe 23177
     }
 
     "play last win board" in {
-      hitLast(board) shouldBe 6804
+      solve(board, _.playLast) shouldBe 6804
     }
   }
 

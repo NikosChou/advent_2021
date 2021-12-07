@@ -13,22 +13,22 @@ class Day2Test extends SubmarineSpec with Day2 {
       .map(Command(_))
       .toList
     "calculate position" in {
-      calculatePosition(input).result shouldBe 150
+      solve(input).result shouldBe 150
     }
 
     "calculate position new process" in {
-      calculatePosition(input).resultWithAim shouldBe 900
+      solve(input).resultWithAim shouldBe 900
     }
   }
 
   "The submarine sonar (Resource)" should {
-    val input = Source.fromResource("day2/input.txt").getLines().map(Command(_)).toList
+    val input = resource.map(Command(_)).toList
     "calculate position " in {
-      calculatePosition(input).result shouldBe 1488669
+      solve(input).result shouldBe 1488669
     }
 
     "calculate position new process" in {
-      calculatePosition(input).resultWithAim shouldBe 1176514794
+      solve(input).resultWithAim shouldBe 1176514794
     }
   }
 }

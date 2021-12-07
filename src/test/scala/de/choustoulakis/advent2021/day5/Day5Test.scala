@@ -25,8 +25,7 @@ class Day5Test extends SubmarineSpec with Day5 {
     }
 
     "The Hydrothermal Venture Resource" should {
-      lazy val input = Source.fromResource("day5/input.txt").getLines()
-      lazy val lines = input
+      lazy val lines = resource
         .map(Line(_))
         .toList
 

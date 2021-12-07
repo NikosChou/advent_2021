@@ -16,7 +16,7 @@ class Day6Test extends SubmarineSpec with Day6 {
   }
 
     "The Fishes (resource)" should {
-      lazy val input = Source.fromResource("day6/input.txt").getLines().reduce(_ + _)
+      lazy val input = resource.reduce(_ + _)
       "grow" in {
         solve(input, 80) shouldBe 366057
       }

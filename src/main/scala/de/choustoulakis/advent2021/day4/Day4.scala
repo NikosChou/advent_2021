@@ -1,8 +1,14 @@
 package de.choustoulakis.advent2021.day4
 
-trait Day4 {
-  def hitFisrt(input: String): Int = Game(input).play
+import de.choustoulakis.advent2021.Puzzle
+import de.choustoulakis.advent2021.day4.Day4.Input
 
-  def hitLast(input: String): Int = Game(input).playLast
-}
+trait Day4 extends Puzzle[Input, Int]:
+  val day = 4
 
+  override def solve(in: Input): Int =
+    val (input, action) = in
+    action(Game(input))
+
+object Day4:
+  type Input = (String, Game => Int)
