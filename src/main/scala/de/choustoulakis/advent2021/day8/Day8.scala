@@ -7,40 +7,26 @@ trait Day8 extends Puzzle[List[String], List[Int]] :
   val day: Int = 8
 
   override def solve(in: List[String]): List[Int] =
-    return in.map {
-      case s"$in | $out" => (in, out)
-    }.map(t => (t._1, t._2.split(" ").toList))
-      .map(t => (t._1, t._2.map(_.sorted)))
-      .map {case (lex: String, digits: List[String]) =>
-        val lexikon = Lexikon(lex)
-        digits.map(s => Signal(s, lexikon).i).mkString("").toInt
-      }
+    in.map { case s"$in | $out" => (in, out) }
+      .map(t => (Lexikon(t._1), t._2.split(" ").map(_.sorted).toList))
+      .map { case (lex: Lexikon, digits: List[String]) =>
+        val value = digits.map(lex.decode(_))
+        Screen(value(0), value(1), value(2), value(3))
+      }.map(_.toInt)
 
 object Day8:
   case class Lexikon(a: Char, b: Char, c: Char, d: Char, e: Char, f: Char, g: Char):
     private def decode(char: Char): Char = char match {
-      case c if c == a => 'a'
-      case c if c == b => 'b'
-      case c1 if c1 == c => 'c'
-      case c if c == d => 'd'
-      case c if c == e => 'e'
-      case c if c == f => 'f'
-      case c if c == g => 'g'
+      case `a` => 'a'
+      case `b` => 'b'
+      case `c` => 'c'
+      case `d` => 'd'
+      case `e` => 'e'
+      case `f` => 'f'
+      case `g` => 'g'
     }
 
-    def decode(signal: String): Int =
-      signal.map(decode).sorted match {
-        case "abcefg" => 0
-        case "cf" => 1
-        case "acdeg" => 2
-        case "acdfg" => 3
-        case "bcdf" => 4
-        case "abdfg" => 5
-        case "abdefg" => 6
-        case "acf" => 7
-        case "abcdefg" => 8
-        case "abcdfg" => 9
-      }
+    def decode(signal: String): Digit = Digit(signal.map(decode).sorted)
 
   object Lexikon:
     def apply(input: String): Lexikon =
@@ -57,7 +43,52 @@ object Day8:
       val _g = grouped.filter(_._2 == 7).filterNot(_._1 == _d).head._1
       Lexikon(_a, _b, _c, _d, _e, _f, _g)
 
-  case class Signal(i: Int)
+  case class Digit(d1: Boolean, d2: Boolean, d3: Boolean, d4: Boolean, d5: Boolean, d6: Boolean, d7: Boolean, toInt: Int):
+    override def toString: String =
+      val as = if (d1) s" ${"a" * 4} " else " " * 6
+      val bsCs = {
+        val b = if (d2) "b" else "·"
+        val c = if (d3) "c" else "·"
+        s"$b    $c\n" * 4
+      }
+      val ds = if (d4) s" ${"d" * 4} " else s" ${"·" * 4} "
+      val esFs = {
+        val e = if (d5) "e" else "·"
+        val f = if (d6) "f" else "·"
+        s"$e    $f\n" * 4
+      }
+      val g = if (d7) s" ${"g" * 4} " else s" ${"·" * 4} "
+      s"$as\n$bsCs$ds\n$esFs$g"
 
-  object Signal:
-    def apply(input: String, lexikon: Lexikon): Signal = Signal(lexikon.decode(input))
+  object Digit:
+    val (zero, one, two, three, four, five, six, seven, eight, nine) =
+      ("abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg")
+
+    def apply(input: String): Digit = {
+      input match {
+        case `zero` => Digit(true, true, true, false, true, true, true, 0)
+        case `one` => Digit(false, false, true, false, false, true, false, 1)
+        case `two` => Digit(true, false, true, false, true, false, true, 2)
+        case `three` => Digit(true, false, true, true, false, true, true, 3)
+        case `four` => Digit(false, true, true, true, false, true, false, 4)
+        case `five` => Digit(true, true, false, true, false, true, true, 5)
+        case `six` => Digit(true, true, false, true, true, true, true, 6)
+        case `seven` => Digit(true, false, true, false, false, true, false, 7)
+        case `eight` => Digit(true, true, true, true, true, true, true, 8)
+        case `nine` => Digit(true, true, true, true, false, true, true, 9)
+      }
+    }
+
+  case class Screen(d1: Digit, d2: Digit, d3: Digit, d4: Digit):
+    val d1s = d1.toString.split("\n")
+    val d2s = d2.toString.split("\n")
+    val d3s = d3.toString.split("\n")
+    val d4s = d4.toString.split("\n")
+
+    val toInt = s"${d1.toInt}${d2.toInt}${d3.toInt}${d4.toInt}".toInt
+
+    override def toString: String = (for {
+      i <- 0 until 11
+      res = s"${d1s(i)}    ${d2s(i)}    ${d3s(i)}   ${d4s(i)}"
+    } yield res).toList.mkString("\n")
+
