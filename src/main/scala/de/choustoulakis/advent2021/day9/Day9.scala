@@ -9,18 +9,17 @@ trait Day9 extends Puzzle[String, Output] :
   override def solve(input: String): Output =
     val strings = input.split("\n")
 
-    def get(i: Int, j: Int): Point = {
-      val value = strings(i)(j)
-      Point(i, j, value.toString.toInt)
-    }
+    import scala.util.Try
+    def get(i: Int, j: Int): Try[Point] = Try(
+      Point(i, j, strings(i)(j).toString.toInt)
+    )
 
     def getNeighbors(p: Point): List[Point] =
-      import scala.util.Try
       List(
-        Try(get(p.i - 1, p.j)),
-        Try(get(p.i + 1, p.j)),
-        Try(get(p.i, p.j - 1)),
-        Try(get(p.i, p.j + 1))
+        get(p.i - 1, p.j),
+        get(p.i + 1, p.j),
+        get(p.i, p.j - 1),
+        get(p.i, p.j + 1)
       ).filter(_.isSuccess).map(_.get)
 
     def allNeighborsRecurs(p: Point, acc: Set[Point] = Set()): Set[Point] = {
@@ -33,9 +32,10 @@ trait Day9 extends Puzzle[String, Output] :
     val part1 = for {
       i <- strings.indices
       j <- strings(0).indices
-      point = get(i, j)
+      maybePoint = get(i, j)
+      if maybePoint.isSuccess
+      point = maybePoint.get
       neighbors = getNeighbors(point)
-      if neighbors.map(_.value).min < 9
       if point.value < neighbors.minBy(_.value).value
     } yield point
 
