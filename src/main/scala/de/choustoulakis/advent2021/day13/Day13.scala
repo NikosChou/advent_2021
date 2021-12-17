@@ -6,14 +6,19 @@ import de.choustoulakis.advent2021.day13.Day13.*
 trait Day13 extends Puzzle[String, Output] {
   val day = 13
 
-  def printPoints(points: Array[Point]): Unit = for {
-    j <- 0 to points.map(_.j).max
-    i <- 0 to points.map(_.i).max
-    str = if (points.find(p => p.i == i && p.j == j).get.contains) '#' else '.'
-    _ = print(str)
-    if (i == points.map(_.i).max)
-    _ = println()
-  } yield ()
+
+  def printPoints(points: Array[Point]): String = {
+    var part2: String = ""
+    for {
+      j <- 0 to points.map(_.j).max
+      i <- 0 to points.map(_.i).max
+      str = if (points.find(p => p.i == i && p.j == j).get.contains) '#' else '.'
+      _ = part2 += str.toString
+      if (i == points.map(_.i).max)
+        _ = part2 += "\n"
+    } yield ()
+    part2
+  }
 
   override def solve(input: String): Output = {
     val paper = input.split("\n\n")(0)
@@ -30,9 +35,7 @@ trait Day13 extends Puzzle[String, Output] {
       case s"fold along y=$y" => Horizontal(y.toInt)
       case s"fold along x=$x" => Vertical(x.toInt)
     }
-
-    instructions.foreach(println)
-
+    
     def fold(instr: Seq[Instructions], points: Seq[Point]) = instr.foldLeft(points) {
       case (pointss, Horizontal(y)) =>
         val res = pointss.filter(_.contains).foldLeft(Seq[Point]())((acc, p) => {
@@ -45,10 +48,8 @@ trait Day13 extends Puzzle[String, Output] {
             acc.filterNot(pp => pp.i == point.i && pp.j == point.j).:+(point)
           }
         })
-        val res2 = enhancedPoints(res)
-        println("Finish H")
-        println()
-        res2
+        enhancedPoints(res)
+
       case (pointss, Vertical(x)) =>
         val res = pointss.filter(_.contains).foldLeft(Seq[Point]())((acc, p) => {
           if (p.i == x) acc
@@ -60,26 +61,20 @@ trait Day13 extends Puzzle[String, Output] {
             acc.filterNot(pp => pp.i == point.i && pp.j == point.j).:+(point)
           }
         })
-        val res2 = enhancedPoints(res)
-        println("Finish V")
-        println()
-        res2
+        enhancedPoints(res)
     }
 
-    //val part1 = fold(instructions.head :: Nil, enhancedPoints)
+    val part1 = fold(instructions.head :: Nil, enhancedPoints(points))
     val part2 = fold(instructions, enhancedPoints(points))
-    printPoints(part2.toArray)
-    //part1.filter(_.contains).foreach(println)
+    val part2Str = printPoints(part2.toArray)
+    
 
-    Output(
-      //part1.filter(_.contains).size,
-      0,
-      0)
+    Output(part1.filter(_.contains).size, part2Str)
   }
 }
 
 object Day13:
-  case class Output(part1: Int, part2: Int)
+  case class Output(part1: Int, part2: String)
 
   case class Point(i: Int, j: Int, contains: Boolean = false)
 
