@@ -19,7 +19,6 @@ trait Day15First extends Puzzle[String, Output] :
     def shortestPath(step: ShortStep, last: Point): ShortStep = {
       if (step.unProcessed == Set()) step
       else {
-        if (step.unProcessed.size % 1000 == 0) println(step.unProcessed.size)
         val (n, newDists, newParents) = step.extractMin().map { case (n, currentD) =>
           val newDists = n.neighbors.collect {
             case point if step.dists.get(point).exists(_ > currentD + point.weight) => point -> (currentD + point.weight)

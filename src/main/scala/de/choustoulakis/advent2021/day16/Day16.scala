@@ -48,8 +48,7 @@ object Day16:
             val packets = binary.drop(7 + 11)
             val step = packets.length / length
             if(typeId == "110") {
-              println(binary)
-            }//000 110 1 00000000010 [[000 100 11110 11110 01101] [001 100 11100 11100 11000 11111 11010 00011] [000 100 10010 10011 10000 01110]]
+            }
             val packetList = packets.sliding(step, step).foldLeft((Seq[Packet](), "")) { case (prev, p) =>
               val (pack, rest) = Packet(prev._2 + p)
               (prev._1.:+(pack), rest)

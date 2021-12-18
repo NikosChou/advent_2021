@@ -20,7 +20,6 @@ trait Day14 extends Puzzle[String, Output] {
         val index = s.indexOf(pair.from)
         if (index > -1) {
           val (first, last) = s.splitAt(index + 1)
-          //println(s"indx: $index, pair: $pair first: $first, last: $last")
           s"$first${pair.c.toLower}${helper(last)}"
         } else {
           s
@@ -44,13 +43,11 @@ trait Day14 extends Puzzle[String, Output] {
         }
       })
       .toMap.toSeq: _*).withDefaultValue(0L)
-    println(map)
 
     (0 until 40).foreach { _ =>
       val newMap = collection.mutable.Map.from(map).withDefaultValue(0L)
         pairs.foreach { p =>
           if (map.contains(p.from)) {
-            //println(s"$p $newMap  $map")
             val v = map(p.from)
             newMap(p.from) -= v
             newMap(p.from.head + p.c.toString) += v
@@ -68,7 +65,6 @@ trait Day14 extends Puzzle[String, Output] {
     count(templateInput.head) += 1
     count(templateInput.last) += 1
     count = count.map(t => (t._1, t._2/2))
-    println(count.toSeq.sortBy(_._2))
 
     Output(steps.groupBy(identity).maxBy(_._2.length)._2.length - steps.groupBy(identity).minBy(_._2.length)._2.length,
       (count.maxBy(_._2)._2) - (count.minBy(_._2)._2))
