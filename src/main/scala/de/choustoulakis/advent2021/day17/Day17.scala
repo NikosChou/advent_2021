@@ -45,12 +45,9 @@ object Day17:
 
     def isProbeInTarget(probe: Probe): Boolean = probe match {
       case Probe(x, y, _, _, _) if fromX <= x && x <= toX && fromY >= y && y >= toY => true
-      case Probe(x, y, _, _, _) => false
+      case _ => false
     }
 
-    def isProbeTooFarWay(probe: Probe): Boolean = probe match {
-      case Probe(x, y, _, _, _) if y < toY => true
-      case Probe(x, y, _, _, _) => false
-    }
+    def isProbeTooFarWay(probe: Probe): Boolean = probe.y < toY
 
 
