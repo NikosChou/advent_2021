@@ -45,7 +45,7 @@ class Day18Test extends SubmarineSpec with Day18 {
       result.normalizeStep.normalizeStep.printPreOrder shouldBe "[[[[0,7],4],[15,[0,13]]],[1,1]]"
       result.normalizeStep.normalizeStep.normalizeStep.printPreOrder shouldBe "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]"
       result.normalizeStep.normalizeStep.normalizeStep.normalizeStep.printPreOrder shouldBe "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]"
-      result.normalizeStep.normalizeStep.normalizeStep.normalizeStep.normalizeStep.printPreOrder shouldBe "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]"
+      result.normalize.printPreOrder shouldBe "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]"
     }
     "addition explode split repeat" in {
       val result = Tree.parseTree("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]")
@@ -56,27 +56,49 @@ class Day18Test extends SubmarineSpec with Day18 {
       res.normalize.printPreOrder shouldBe "[[[[1,1],[2,2]],[3,3]],[4,4]]"
     }
     "add 5 numbers" in {
-      val res = Tree.parseTree("[[[[[[1,1],[2,2]],[3],3]],[4,4]],[5,5]]")
+      val res = Tree.parseTree("[[[[[[1,1],[2,2]],[3,3]],[4,4]],[5,5]]")
       res.normalize.printPreOrder shouldBe "[[[[3,0],[5,3]],[4,4]],[5,5]]"
     }
-  }
-  "The day17" ignore {
-    val result = solve("target area: x=20..30, y=-10..-5")
-    "solve part1" in {
-      result.part1 shouldBe 45
+    "add 6 numbers" in {
+      val res = "[1,1]\n[2,2]\n[3,3]\n[4,4]\n[5,5]\n[6,6]".split("\n").map(_.trim).map(Tree.parseTree).reduce(_ + _)
+      res.normalize.printPreOrder shouldBe "[[[[5,0],[7,4]],[5,5]],[6,6]]"
     }
-    "solve part2" in {
-      result.part2 shouldBe 112
+    "large test" in {
+      val input: String =
+        """[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
+          |[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
+          |[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
+          |[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]
+          |[7,[5,[[3,8],[1,4]]]]
+          |[[2,[2,2]],[8,[8,1]]]
+          |[2,9]
+          |[1,[[[9,3],9],[[9,0],[0,7]]]]
+          |[[[5,[7,4]],7],1]
+          |[[[[4,2],2],6],[8,7]]""".stripMargin
+
+      val res = input.split("\n").map(Tree.parseTree(_)).foldLeft(EmptyLeaf.asInstanceOf[Tree]){(l, r) =>
+        println("  " + l.printPreOrder)
+        println("+ " + r.printPreOrder)
+        val normalize = (l + r).normalize
+        println("= " + normalize.printPreOrder)
+        println()
+        normalize
+      }
+      res.printPreOrder shouldBe "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"
+    }
+    "the magnidude" in {
+      Tree.parseTree("[[1,2],[[3,4],5]]").magnitude shouldBe 143
+      Tree.parseTree("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]").magnitude shouldBe 3488
     }
   }
 
-  "The day 17 Resource" ignore {
-    val result = solve(resource.head)
+  "The day 17 Resource" should {
+    val result = solve(resource)
     "solve part 1" in {
-      result.part1 shouldBe 14535
+      result.part1 shouldBe 3051
     }
     "solve part 2" in {
-      result.part2 shouldBe 2270
+      result.part2 shouldBe 4812
     }
   }
 

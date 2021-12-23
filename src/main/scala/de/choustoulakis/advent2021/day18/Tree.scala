@@ -13,6 +13,8 @@ sealed trait Tree {
 
   def normalizeStep: Tree
 
+  def magnitude: Long
+
   def depth: Int = {
     def go(t: Tree, depth: Int = 0): Int = {
       t match {
@@ -28,6 +30,7 @@ sealed trait Tree {
     def go(t: Tree): String = t match {
       case Leaf(v) => s"$v"
       case Node(left, right) => s"[${go(left)},${go(right)}]"
+      case _ => ""
     }
 
     go(this)
@@ -36,7 +39,7 @@ sealed trait Tree {
   def normalize: Tree = {
     def loop(t: Tree): Tree = {
       val normalized = t.normalizeStep
-      if(normalized == t) t else loop(normalized)
+      if (normalized == t) t else loop(normalized)
     }
 
     loop(this)
@@ -75,6 +78,8 @@ case object EmptyLeaf extends Tree {
   override def +(that: Tree): Tree = that
 
   override def normalizeStep: Tree = this
+
+  override def magnitude: Long = 0L
 }
 
 case class Leaf(var value: Int) extends Tree {
@@ -86,6 +91,8 @@ case class Leaf(var value: Int) extends Tree {
 
   override def normalizeStep: Tree = this
 
+  override def magnitude: Long = value
+
 }
 
 case class Node(left: Tree, right: Tree) extends Tree {
@@ -95,44 +102,46 @@ case class Node(left: Tree, right: Tree) extends Tree {
 
   override def +(that: Tree): Tree = Node(this, that)
 
+  override def magnitude: Long = (3 * left.magnitude) + (2 * right.magnitude)
+
   override def normalizeStep: Tree = {
-    def updateLeaf(tree: Tree, toAdd: Int): Tree = {
+    def updateLeafLeft(tree: Tree, toAdd: Int): Tree = {
       tree match {
         case Leaf(v) => Leaf(v + toAdd)
-        case Node(left, right) => Node(updateLeaf(left, toAdd), right)
+        case Node(left, right) => Node(updateLeafLeft(left, toAdd), right)
+      }
+    }
+
+    def updateLeafRight(tree: Tree, toAdd: Int): Tree = {
+      tree match {
+        case Leaf(v) => Leaf(v + toAdd)
+        case Node(left, right) => Node(left, updateLeafRight(right, toAdd))
       }
     }
 
     def explode(tree: Tree, d: Int): (Tree, Int, Int) = {
       tree match {
-        case node@Node(Leaf(v), Node(Leaf(left), Leaf(right))) if (d > 2) => (Node(Leaf(left + v), 0), -1, right)
-        case node@Node(Node(Leaf(left), Leaf(right)), Leaf(v)) if (d > 2) => (Node(0, Leaf(right + v)), left, -1)
+        case Node(Leaf(left), Leaf(right)) if (d > 3) => (EmptyLeaf, left, right)
         case Node(left, right) => {
           val (leftTree, ll, lr) = explode(left, d + 1)
-          val (rghtTree, rl, rr) = if (left == left && ll == -1 && ll == -1) explode(right, d + 1) else (right, -1, -1)
-          if (leftTree != left) {
-            if (lr > -1) {
-              (Node(leftTree, updateLeaf(right, lr)), -1, -1)
-            } else {
-              (Node(leftTree, right), -1, -1)
-            }
-          } else if (rghtTree != right) {
-            if (rl > -1) {
-              (Node(updateLeaf(left, rl), rghtTree), -1, -1)
-            } else {
-              (Node(left, rghtTree), rl, rr)
-            }
+          val (rghtTree, rl, rr) = if (leftTree == left) explode(right, d + 1) else (right, 0, 0)
+
+          if (leftTree == left && rghtTree == right) {
+            (tree, 0, 0)
+          } else if (leftTree == EmptyLeaf) {
+            (Node(0, updateLeafLeft(right, lr)), ll, 0)
+
+          } else if (rghtTree == EmptyLeaf) {
+            (Node(updateLeafRight(left, rl), 0), 0, rr)
           } else {
-            if (lr > -1) {
-              (Node(leftTree, updateLeaf(right, lr)), -1, -1)
-            } else if (rl > -1) {
-              (Node(updateLeaf(left, rl), rghtTree), -1, -1)
+            if (leftTree == left) {
+              (Node(updateLeafRight(leftTree, ll + rl), rghtTree), 0, lr + rr)
             } else {
-              (tree, -1, -1)
+              (Node(leftTree, updateLeafLeft(rghtTree, lr + rr)), rl + ll, 0)
             }
           }
         }
-        case _ => (tree, -1, -1)
+        case _ => (tree, 0, 0)
       }
     }
 
@@ -144,11 +153,45 @@ case class Node(left: Tree, right: Tree) extends Tree {
         case Node(left, right) =>
           val resLeft = split(left)
           if (resLeft != left) Node(resLeft, right) else Node(left, split(right))
-        case _:Leaf => tree
+        case _: Leaf => tree
       }
     }
 
-    val (exploded, _, _) = explode(this, 0)
-    if (exploded != this) exploded else split(this)
+    def splitPos(tree: Tree): (Int, Boolean) = {
+      def loop(t: Tree, pos: Int): (Int, Boolean) = {
+        t match {
+          case Leaf(v) if v > 9 => (pos + 1, true)
+          case Leaf(v) => (pos + 1, false)
+          case Node(left, right) =>
+            val (poss, pass) = loop(left, pos)
+            if (pass) (poss, true) else loop(right, poss)
+        }
+      }
+
+      loop(tree, -1)
+    }
+
+    def explodePos(tree: Tree): (Int, Int) = {
+      def loop(t: Tree, pos: Int, d: Int): (Int, Int) = {
+        t match {
+          case Node(left, right) =>
+            val (poss, dd) = loop(left, pos, d + 1)
+            if (dd > 3) (poss, dd) else loop(right, poss, d + 1)
+          case _ => (pos + 1, d)
+        }
+      }
+
+      loop(tree, -1, -1)
+    }
+
+    val splitPosition = splitPos(this)
+    val explodePoss = explodePos(this)
+    //println(s"$splitPosition    $explodePoss    $printPreOrder")
+    if (explodePoss._2 < 4) {
+      if (splitPosition._2) {
+        return split(this)
+      }
+    }
+    explode(this, 0)._1
   }
 }
