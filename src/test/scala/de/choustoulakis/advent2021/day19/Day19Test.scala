@@ -18,13 +18,13 @@ class Day19Test extends SubmarineSpec with Day19 {
     }
   }
 
-  "The day 17 Resource" ignore {
+  "The day 17 Resource" should {
     val result = solve(resource)
     "solve part 1" in {
       result.part1 shouldBe 318
     }
     "solve part 2" in {
-      result.part2 shouldBe 4812
+      result.part2 shouldBe 12166
     }
   }
 
