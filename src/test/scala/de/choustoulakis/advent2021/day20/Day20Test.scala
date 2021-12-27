@@ -1,7 +1,6 @@
 package de.choustoulakis.advent2021.day20
 
 import de.choustoulakis.advent2021.SubmarineSpec
-import de.choustoulakis.advent2021.day19.Day19.*
 
 import scala.io.Source
 
